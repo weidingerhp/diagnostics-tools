@@ -111,7 +111,11 @@ namespace LowLevelDesign.Diagnostics
                 foreach (var handler in handlers)
                 {
                     logger.TraceEvent(TraceEventType.Error, 0, "------------------ HANDLER ---------------------");
-                    handler.Invoke(null, new Object[] { logger, firstChanceExceptionEventArgs.Exception });
+                    try {
+                        handler.Invoke(null, new Object[] { logger, firstChanceExceptionEventArgs.Exception });
+                    } catch (Exception ex) {
+                        logger.TraceEvent(TraceEventType.Error, 0, "Exception thrown by the handler: {0}", ex);
+                    }
                 }
             }
 
