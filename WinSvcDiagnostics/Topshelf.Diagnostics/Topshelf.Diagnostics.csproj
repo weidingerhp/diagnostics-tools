@@ -44,6 +44,7 @@
   <ItemGroup>
     <Compile Include="HostConfiguratorExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WindowsHostEnvironmentWithDebugSupport.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
