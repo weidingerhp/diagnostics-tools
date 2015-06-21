@@ -1,13 +1,14 @@
-﻿using System.Reflection;
+﻿using CommandLine.Text;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("InWrap")]
-[assembly: AssemblyProduct("InWrap")]
-[assembly: AssemblyCopyright("Copyright © Sebastian Solnica 2014")]
+[assembly: AssemblyTitle("winsvcdiag")]
+[assembly: AssemblyProduct("winsvcdiag")]
+[assembly: AssemblyCopyright("Copyright (C) Sebastian Solnica 2015")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
