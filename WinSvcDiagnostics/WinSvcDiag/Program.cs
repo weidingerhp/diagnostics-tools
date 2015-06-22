@@ -14,6 +14,10 @@ namespace LowLevelDesign.Diagnostics
     {
         static void Main(string[] args)
         {
+            if (!IsUserAdmin()) {
+                Console.WriteLine("You need to be an administrator to use this application.");
+                return;
+            }
             var result = CommandLine.Parser.Default.ParseArguments<Options>(args);
             if (result.Errors.Any()) {
                 return;
@@ -24,15 +28,11 @@ namespace LowLevelDesign.Diagnostics
             }
 
             if (result.Value.ListHooks) {
-                ListRegistryEntries();
+                ImageFileExecutionWrapper.ListHooks();
                 return;
             }
 
             if (result.Value.Timeout > 0) {
-                if (!IsUserAdmin()) {
-                    Console.WriteLine("You must be an administrator to set a service wait time. Run the application from the administrative command line.");
-                    return;
-                }
                 SetServiceTimeout(result.Value.Timeout);
             } else {
                 if (GetServiceTimeout() < 60000) { 
@@ -50,9 +50,9 @@ namespace LowLevelDesign.Diagnostics
             }
 
             if (result.Value.ShouldInstall) {
-                SetupRegistry(svcpath, true);
+                ImageFileExecutionWrapper.SetupHook(svcpath, true);
             } else if (result.Value.ShouldUninstall) {
-                SetupRegistry(svcpath, false);
+                ImageFileExecutionWrapper.SetupHook(svcpath, false);
             } else {
                 // here the logic will be a bit more complicated - we will start the process
                 // as suspended and then wait for the debugger to appear
@@ -67,53 +67,6 @@ namespace LowLevelDesign.Diagnostics
             Debug.Assert(identity != null);
             var principal = new WindowsPrincipal(identity);
             return principal.IsInRole(WindowsBuiltInRole.Administrator);
-        }
-
-        private static void SetupRegistry(String appImageExe, bool isInstallation)
-        {
-            Debug.Assert(appImageExe != null);
-            if (!IsUserAdmin()) {
-                Console.WriteLine("You must be admin to do that. Run the app from the administrative console.");
-                return;
-            }
-            // extrace image.exe if path is provided
-            appImageExe = Path.GetFileName(appImageExe);
-            var regkey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options", true);
-            Debug.Assert(regkey != null);
-            // add to image file execution path
-            if (isInstallation) {
-                regkey = regkey.CreateSubKey(appImageExe);
-                Debug.Assert(regkey != null, "regkey != null");
-                regkey.SetValue("Debugger", "\"" + Assembly.GetExecutingAssembly().Location + "\"");
-            } else {
-                regkey.DeleteSubKey(appImageExe, false);
-            }
-        }
-
-        private static void ListRegistryEntries()
-        {
-            var asmpath = "\"" + Assembly.GetExecutingAssembly().Location + "\"";
-
-            var regkey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Image File Execution Options", true);
-            Debug.Assert(regkey != null);
-
-            var hooks = new List<String>();
-            foreach (var skn in regkey.GetSubKeyNames()) {
-                var sk = regkey.OpenSubKey(skn, false);
-                var v = sk.GetValue("Debugger") as String;
-                if (v != null && v.StartsWith(asmpath, StringComparison.OrdinalIgnoreCase)) {
-                    hooks.Add(skn);
-                }
-            }
-
-            if (hooks.Count == 0) {
-                Console.WriteLine("No hooks found.");
-            } else {
-                Console.WriteLine("Hooks installed for:");
-                foreach (var h in hooks) {
-                    Console.WriteLine(" * " + h);
-                }
-            }
         }
 
         private static int GetServiceTimeout()

@@ -1,8 +1,11 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -23,10 +26,17 @@ namespace LowLevelDesign.Diagnostics
             STARTUPINFO si = new STARTUPINFO();
             PROCESS_INFORMATION pi = new PROCESS_INFORMATION();
 
+            // disable the hook so won't call ourselves recursively
+            ImageFileExecutionWrapper.SetupHook(imagePath, false);
+
             var sargs = String.Join(" ", args);
-            sargs = String.Join(" ", imagePath, sargs);
+            sargs = String.Join(" ", "\"" + imagePath + "\"", sargs);
             bool success = NativeMethods.CreateProcess(null, sargs, IntPtr.Zero, IntPtr.Zero,
                 false, ProcessCreationFlags.CREATE_SUSPENDED, IntPtr.Zero, null, ref si, out pi);
+
+            // enable the hook again
+            ImageFileExecutionWrapper.SetupHook(imagePath, true);
+
             if (!success) {
                 throw new Win32Exception();
             }
