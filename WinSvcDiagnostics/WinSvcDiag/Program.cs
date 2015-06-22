@@ -14,19 +14,18 @@ namespace LowLevelDesign.Diagnostics
     {
         static void Main(string[] args)
         {
-            if (!IsUserAdmin()) {
-                Console.WriteLine("You need to be an administrator to use this application.");
-                return;
-            }
             var result = CommandLine.Parser.Default.ParseArguments<Options>(args);
             if (result.Errors.Any()) {
+                return;
+            }
+            if (!IsUserAdmin()) {
+                Console.WriteLine("You need to be an administrator to use this application.");
                 return;
             }
             if (result.Value.ShouldInstall && result.Value.ShouldUninstall) {
                 Console.WriteLine("You need to decide whether you would like to install or uninstall a hook.");
                 return;
             }
-
             if (result.Value.ListHooks) {
                 ImageFileExecutionWrapper.ListHooks();
                 return;
