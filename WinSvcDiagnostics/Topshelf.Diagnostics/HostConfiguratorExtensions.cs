@@ -34,14 +34,21 @@ namespace Topshelf.Diagnostics
         }
 
         public static void UseWindowsHostEnvironmentWithDebugSupport(this HostConfigurator hc) {
-            hc.UseEnvironmentBuilder(() => { return new WindowsHostEnvironmentBuilderWithDebugSupport(); });
+            hc.UseEnvironmentBuilder((hconf) => { return new WindowsHostEnvironmentBuilderWithDebugSupport(hconf); });
         }
     }
 
     class WindowsHostEnvironmentBuilderWithDebugSupport : EnvironmentBuilder
     {
+        private readonly HostConfigurator hc;
+
+        public WindowsHostEnvironmentBuilderWithDebugSupport(HostConfigurator hc)
+        {
+            this.hc = hc;
+        }
+
         public HostEnvironment Build() {
-            return new WindowsHostEnvironmentWithDebugSupport();
+            return new WindowsHostEnvironmentWithDebugSupport(hc);
         }
     }
 

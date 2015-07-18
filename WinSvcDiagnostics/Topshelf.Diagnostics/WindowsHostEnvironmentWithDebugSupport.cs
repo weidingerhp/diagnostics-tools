@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Topshelf.HostConfigurators;
 using Topshelf.Runtime;
 using Topshelf.Runtime.Windows;
 
@@ -11,7 +12,11 @@ namespace Topshelf.Diagnostics
 {
     class WindowsHostEnvironmentWithDebugSupport : HostEnvironment
     {
-        private readonly WindowsHostEnvironment wrappedHost = new WindowsHostEnvironment();
+        private readonly WindowsHostEnvironment wrappedHost;
+
+        public WindowsHostEnvironmentWithDebugSupport(HostConfigurator hc) {
+            this.wrappedHost = new WindowsHostEnvironment(hc);
+        }
 
         public bool IsRunningAsAService {
             get { return Process.GetCurrentProcess().SessionId == 0; }
