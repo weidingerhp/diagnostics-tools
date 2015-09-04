@@ -174,13 +174,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\MsSqlConnection.cs" />
-    <Compile Include="Models\MsSqlDashboardModel.cs" />
-    <Compile Include="Models\MsSqlDatabaseAnalysis.cs" />
-    <Compile Include="Models\MsSqlRequest.cs" />
-    <Compile Include="Models\MsSqlSession.cs" />
-    <Compile Include="Models\MsSqlTopQuery.cs" />
-    <Compile Include="Models\MsSqlTransaction.cs" />
+    <Compile Include="Models\MsSqlModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -194,6 +188,7 @@
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\_ViewStart.cshtml" />
+    <None Include="Properties\PublishProfiles\local.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
