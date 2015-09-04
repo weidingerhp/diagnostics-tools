@@ -1,0 +1,197 @@
+@using System.Web.Configuration
+@using Bazik.Models
+@model MsSqlDashboardModel
+@{
+    ViewBag.Title = "Bazik (MS SQL Server - " + Model.ServerName + ")";
+    ViewBag.StyleSheet = "../../Styles/HomeDashboard.css";
+}
+
+@section Style
+{
+    <style type="text/css">
+        body
+        {
+            font-family: helvetica;
+            font-size: 12px;
+        }
+        table
+        {
+            border: 1px solid;
+            border-collapse: collapse;
+        }
+        table, th, td
+        {
+            border: 1px solid black;
+            padding: 4px;
+            vertical-align: top;
+        }
+        td
+        {
+            text-align: right;
+        }
+    </style>
+}
+
+<h1>Bazik (MS SQL Server - @Model.ServerName)</h1>
+<div style="border: 1px solid black; padding: 3px">
+@using (Html.BeginForm())
+{
+    <select name="qtype">
+        <option value="si">Index state</option>
+        <option value="ttio">Top 20 Total I/O</option>
+        <option value="ttcpu">Top 20 Total CPU</option>
+        <option value="tttime">Top 20 Total Time</option>
+        <option value="taio">Top 20 Avg. IO</option>
+        <option value="tacpu">Top 20 Avg. CPU</option>
+        <option value="tatime">Top 20 Avg. Time</option>
+    </select>
+    @: na
+    <select name="db">
+    @foreach (var d in Model.DatabaseNames)
+    {
+        <option value="@d">@d</option>
+    }
+    </select>
+    @Html.Hidden("server", Model.ServerName)
+    <input type="submit" value="Poka¿" />
+}
+</div>
+
+<h2>Active requests - server</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>SID:RID</th>
+            <th>Database</th>
+            <th>Sql</th>
+            <th style="min-width: 90px">Start time</th>
+            <th>Elapsed time (s)</th>
+            <th>Status</th>
+            <th>Command</th>
+            <th style="max-width: 60px">Blocking session</th>
+            <th>Wait type</th>
+            <th>Tran</th>
+            <th>Complete %</th>
+            <th>CPU (ms)</th>
+            <th>Reads</th>
+            <th>Logical reads</th>
+            <th>Writes</th>
+            <th>Host</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (MsSqlRequest req in Model.ActiveRequests)
+        {
+            <tr>
+                <td><a href="@Url.Action("Request", new { srv = Model.ServerName, rid = req.request_id, sid = req.session_id })">@req.session_id:@req.request_id</a></td>
+                <td>@req.database_name</td>
+                <td><a href="@Url.Action("Request", new { srv = Model.ServerName, rid = req.request_id, sid = req.session_id })#plan" onclick="">show</a></td>
+                <td>@req.start_time</td>
+                <td>@TimeSpan.FromSeconds(req.total_elapsed_time).TotalMinutes.ToString(".##")</td>
+                <td>@req.status</td>
+                <td>@req.command</td>
+                <td>
+                    @if (req.blocking_session_id != 0)
+                    {
+                        <a href="@Url.Action("Session", new { srv = Model.ServerName, sid = req.blocking_session_id })">@req.blocking_session_id</a>
+                    }
+                </td>
+                <td>@req.wait_type</td>
+                <td>@req.transaction_id</td>
+                <td>@req.percent_complete.ToString("0.##")</td>
+                <td>@req.cpu_time.ToString("#,0")</td>
+                <td>@req.reads.ToString("#,0")</td>
+                <td>@req.logical_reads.ToString("#,0")</td>
+                <td>@req.writes.ToString("#,0")</td>
+                <td>@req.host_name</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h2>Active transactions - server</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>SID</th>
+            <th>User trn</th>
+            <th>Host</th>
+            <th>Program</th>
+            <th>TranID</th>
+            <th style="min-width: 90px">Start time</th>
+            <th>Status</th>
+            <th>Log rec count</th>
+            <th>Log bytes used</th>
+            <th>Log bytes reserved</th>
+            <th>Begin lsn</th>
+            <th>Last lsn</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (MsSqlTransaction tran in Model.ActiveTransactions)
+        {
+            <tr>
+                <td><a href="@Url.Action("Session", new { srv = Model.ServerName, sid = tran.session_id })">@tran.session_id</a></td>
+                <td>@(tran.is_user_transaction ? "T" : "N")</td>
+                <td>@tran.host_name</td>
+                <td>@tran.program_name</td>
+                <td>@tran.transaction_id</td>
+                <td>@tran.database_transaction_begin_time</td>
+                <td>@tran.database_transaction_state</td>
+                <td>@tran.database_transaction_log_record_count</td>
+                <td>@tran.database_transaction_log_bytes_used</td>
+                <td>@tran.database_transaction_log_bytes_reserved</td>
+                <td>@tran.database_transaction_begin_lsn</td>
+                <td>@tran.database_transaction_last_lsn</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h2>Active sessions (@WebConfigurationManager.AppSettings["ActiveSessionsNum"] with highest number of I/O) - server</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th style="min-width: 90px">Login time</th>
+            <th style="max-width: 24px">No req</th>
+            <th style="max-width: 24px">No tran</th>
+            <th style="max-width: 24px">No lock</th>
+            <th style="max-width: 24px">Wait lock</th>
+            <th>Reads</th>
+            <th>Logical reads</th>
+            <th>Writes</th>
+            <th>CPU (ms)</th>
+            <th>Memory</th>
+            <th>Host</th>
+            <th>Nazwa programu</th>
+            <th>Login</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (MsSqlSession sess in Model.ActiveSesssions)
+        {
+            <tr>
+                <td><a href="@Url.Action("Session", new { srv = Model.ServerName, sid = sess.session_id })">@sess.session_id</a></td>
+                <td style="font-size: 9px">@sess.login_time</td>
+                <td>@sess.request_num</td>
+                <td>@sess.explicit_tran_num</td>
+                <td>@sess.locks_num</td>
+                <td>@sess.waiting_locks_num</td>
+                <td>@sess.reads.ToString("#,0")</td>
+                <td>@sess.logical_reads.ToString("#,0")</td>
+                <td>@sess.writes.ToString("#,0")</td>
+                <td>@sess.cpu_time.ToString("#,0")</td>
+                <td>@(sess.memory_usage * 8) KB</td>
+                <td>@sess.host_name</td>
+                <td>@sess.program_name</td>
+                <td>@sess.login_name</td>
+                <td>@sess.status</td>
+            </tr>
+        }
+    </tbody>
+</table>
