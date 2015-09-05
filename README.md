@@ -1,5 +1,5 @@
-.NET diagnostics toolkit
-========================
+My diagnostics tools
+====================
 
 It is a repository of small tools which might help you diagnose .NET and Windows applications. Some tools are still available on the old [Codeplex page](http://diagnettoolkit.codeplex.com/).
 
