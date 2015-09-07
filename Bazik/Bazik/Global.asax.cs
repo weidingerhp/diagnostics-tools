@@ -18,11 +18,11 @@ namespace Bazik
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
-            routes.MapRoute("IndexRanger", "bazik", new { controller = "IndexRanger", action = "ShowDashboard" });
-            routes.MapRoute("IndexRanger-log", "bazik/loguj", new { controller = "IndexRanger", action = "Log" });
-            routes.MapRoute("IndexRanger-request", "bazik/request", new { controller = "IndexRanger", action = "Request" });
-            routes.MapRoute("IndexRanger-index", "bazik/index-stats", new { controller = "IndexRanger", action = "IndexStats" });
-            routes.MapRoute("IndexRanger-top", "bazik/top", new { controller = "IndexRanger", action = "TopQueries" });
+            routes.MapRoute("IndexRanger", "d/{serverName}", new { controller = "IndexRanger",
+                action = "ShowDashboard", serverName = UrlParameter.Optional });
+            routes.MapRoute("IndexRanger-request", "request", new { controller = "IndexRanger", action = "Request" });
+            routes.MapRoute("IndexRanger-index", "index-stats", new { controller = "IndexRanger", action = "IndexStats" });
+            routes.MapRoute("IndexRanger-top", "top", new { controller = "IndexRanger", action = "TopQueries" });
 
             routes.MapRoute(
                 "Default", // Route name
