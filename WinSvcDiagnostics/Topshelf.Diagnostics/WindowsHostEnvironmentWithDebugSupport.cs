@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Topshelf.HostConfigurators;
 using Topshelf.Runtime;
 using Topshelf.Runtime.Windows;
@@ -28,10 +24,6 @@ namespace Topshelf.Diagnostics
 
         public Host CreateServiceHost(HostSettings settings, ServiceHandle serviceHandle) {
             return wrappedHost.CreateServiceHost(settings, serviceHandle);
-        }
-
-        public void InstallService(InstallHostSettings settings, Action beforeInstall, Action afterInstall, Action beforeRollback, Action afterRollback) {
-            wrappedHost.InstallService(settings, beforeInstall, afterInstall, beforeRollback, afterRollback);
         }
 
         public bool IsAdministrator {
@@ -64,6 +56,11 @@ namespace Topshelf.Diagnostics
 
         public void UninstallService(HostSettings settings, Action beforeUninstall, Action afterUninstall) {
             wrappedHost.UninstallService(settings, beforeUninstall, afterUninstall);
+        }
+
+        public void InstallService(InstallHostSettings settings, Action<InstallHostSettings> beforeInstall, Action afterInstall, Action beforeRollback, Action afterRollback)
+        {
+            wrappedHost.InstallService(settings, beforeInstall, afterInstall, beforeRollback, afterRollback);
         }
     }
 }
