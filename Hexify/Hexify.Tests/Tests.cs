@@ -1,9 +1,5 @@
 ﻿using LowLevelDesign.Hexify;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Hexify.Tests
@@ -52,6 +48,11 @@ namespace Hexify.Tests
             expectedOutput = "0000: 17 6f 59 00 00 0a 00 02 7b 1b 00 00 04 72 c7 0a  .oY.....{....rÇ.\r\n" +
                 "0010: 00 70 6f 4a 00 00 0a 00 02 7b 1d 00 00 04 1f 64  .poJ.....{.....d";
             Assert.Equal(expectedOutput, Hex.PrettyPrint(data));
+            expectedOutput = "0000: 6f 59 00 00 0a 00 02 7b 1b 00 00 04 72 c7 0a 00  oY.....{....rÇ..\r\n" +
+                "0010: 70 6f 4a 00 00 0a 00 02 7b 1d 00 00              poJ.....{...";
+            Assert.Equal(expectedOutput, Hex.PrettyPrint(data, 1, data.Length - 4));
+            expectedOutput = "0000: 00 70 6f 4a 00 00 0a 00 02 7b 1d 00 00 04 1f     .poJ.....{.....";
+            Assert.Equal(expectedOutput, Hex.PrettyPrint(data, 16, data.Length - 16 - 1));
         }
     }
 }
