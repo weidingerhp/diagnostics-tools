@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace LowLevelDesign.Win32
 {
@@ -212,7 +213,7 @@ namespace LowLevelDesign.Win32
 
         [DllImport("kernel32.dll", SetLastError = true)]
         public static extern bool CreateProcess(string lpApplicationName, string lpCommandLine, IntPtr lpProcessAttributes,
-                IntPtr lpThreadAttributes, bool bInheritHandles, CreateProcessFlags dwCreationFlags, IntPtr lpEnvironment,
+                IntPtr lpThreadAttributes, bool bInheritHandles, CreateProcessFlags dwCreationFlags, [In, MarshalAs(UnmanagedType.LPStr)] StringBuilder lpEnvironment,
                 string lpCurrentDirectory, [In] ref STARTUPINFO lpStartupInfo, out PROCESS_INFORMATION lpProcessInformation);
 
         [DllImport("kernel32.dll", SetLastError = true)]

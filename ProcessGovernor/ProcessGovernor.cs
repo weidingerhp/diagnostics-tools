@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
 using NDesk.Options;
 using LowLevelDesign.Win32;
+using System.Text;
 
 namespace LowLevelDesign
 {
@@ -17,6 +17,7 @@ namespace LowLevelDesign
             List<String> procargs = null;
             bool showhelp = false;
             int pid = 0;
+			string coragentguid = null;
 
             var p = new OptionSet()
             {
@@ -36,6 +37,7 @@ namespace LowLevelDesign
                             return;
                         }
                         maxmem = UInt32.Parse(v); }},
+				{ "a|agent=", "Profiler or Agent UID (e.g. -a={B7038F67-52FC-4DA2-AB02-969B3C1EDA03} )", v => coragentguid = v },
                 { "p|pid=", "Attach to an already running process", (int v) => pid = v },
                 { "h|help", "Show this message and exit", v => showhelp = v != null },
                 { "?", "Show this message and exit", v => showhelp = v != null }
@@ -76,7 +78,16 @@ namespace LowLevelDesign
                     hProcess = CheckResult(ApiMethods.OpenProcess(ProcessAccessFlags.AllAccess, false, pid));
                 } else {
                     // start suspended process
-                    pi = StartSuspendedProcess(procargs);
+					if (coragentguid != null) {
+						
+					}
+					Dictionary<string, string> additionalEnv = new Dictionary<string, string>();
+					if (coragentguid != null) {
+						additionalEnv["COR_ENABLE_PROFILING"] = "0x01";
+						additionalEnv["COR_PROFILER"] = coragentguid;
+					}
+					
+                    pi = StartSuspendedProcess(procargs, additionalEnv);
                     hProcess = pi.hProcess;
                 }
 
@@ -145,13 +156,31 @@ namespace LowLevelDesign
             p.WriteOptionDescriptions(Console.Out);
         }
 
-        static PROCESS_INFORMATION StartSuspendedProcess(IList<String> procargs) {
+        static PROCESS_INFORMATION StartSuspendedProcess(IList<String> procargs, Dictionary<string, string> additionalEnv) {
             PROCESS_INFORMATION pi;
             STARTUPINFO si = new STARTUPINFO();
+			StringBuilder envEntries = new StringBuilder();
+			
+			foreach( var env in Environment.GetEnvironmentVariables().Keys) {
+				if (additionalEnv.ContainsKey((string) env)) continue; // overwrite existing env
+				envEntries.Append(env);
+				envEntries.Append("=");
+				envEntries.Append(Environment.GetEnvironmentVariable((string) env));
+				envEntries.Append("\0");
+			}
 
+			foreach( string env in additionalEnv.Keys) {
+				envEntries.Append(env);
+				envEntries.Append("=");
+				envEntries.Append(additionalEnv[env]);
+				envEntries.Append("\0");
+			}
+
+			if (envEntries.Length < 1) envEntries.Append("\0");
+			envEntries.Append("\0");
             CheckResult(ApiMethods.CreateProcess(null, String.Join(" ", procargs), IntPtr.Zero, IntPtr.Zero, false,
                         CreateProcessFlags.CREATE_SUSPENDED | CreateProcessFlags.CREATE_NEW_CONSOLE,
-                        IntPtr.Zero, null, ref si, out pi));
+                        envEntries, null, ref si, out pi));
             return pi;
         }
 
