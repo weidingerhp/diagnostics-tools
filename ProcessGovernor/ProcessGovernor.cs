@@ -37,7 +37,7 @@ namespace LowLevelDesign
                             return;
                         }
                         maxmem = UInt32.Parse(v); }},
-				{ "profilerguid=", "Profiler GUID (e.g. --profilerguid={XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX} )", v => profilerguid = v },
+				{ "profilerguid=", "Profiler GUID", v => profilerguid = v },
                 { "p|pid=", "Attach to an already running process", (int v) => pid = v },
                 { "h|help", "Show this message and exit", v => showhelp = v != null },
                 { "?", "Show this message and exit", v => showhelp = v != null }

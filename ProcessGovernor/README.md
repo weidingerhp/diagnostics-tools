@@ -10,8 +10,7 @@ Options:
  -m, --maxmem=VALUE         Max committed memory usage in bytes (accepted
                               suffixes: K, M or G).
      --profilerguid=XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
-                            Profiler GUID (e.g. --profilerguid=XXXXXXXX-XXXX-
-                              XXXX-XXXX-XXXXXXXXXXXX )
+                            Profiler GUID
  -p, --pid=VALUE            Attach to an already running process
  -h, --help                 Show this message and exit
  -?                         Show this message and exit
