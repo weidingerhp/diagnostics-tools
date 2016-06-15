@@ -17,7 +17,7 @@ namespace LowLevelDesign
             List<String> procargs = null;
             bool showhelp = false;
             int pid = 0;
-			string coragentguid = null;
+			string profilerguid = null;
 
             var p = new OptionSet()
             {
@@ -37,7 +37,7 @@ namespace LowLevelDesign
                             return;
                         }
                         maxmem = UInt32.Parse(v); }},
-				{ "a|agent=", "Profiler or Agent UID (e.g. -a={B7038F67-52FC-4DA2-AB02-969B3C1EDA03} )", v => coragentguid = v },
+				{ "profilerguid=", "Profiler GUID (e.g. --profilerguid={XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX} )", v => profilerguid = v },
                 { "p|pid=", "Attach to an already running process", (int v) => pid = v },
                 { "h|help", "Show this message and exit", v => showhelp = v != null },
                 { "?", "Show this message and exit", v => showhelp = v != null }
@@ -78,13 +78,13 @@ namespace LowLevelDesign
                     hProcess = CheckResult(ApiMethods.OpenProcess(ProcessAccessFlags.AllAccess, false, pid));
                 } else {
                     // start suspended process
-					if (coragentguid != null) {
+					if (profilerguid != null) {
 						
 					}
 					Dictionary<string, string> additionalEnv = new Dictionary<string, string>();
-					if (coragentguid != null) {
+					if (profilerguid != null) {
 						additionalEnv["COR_ENABLE_PROFILING"] = "0x01";
-						additionalEnv["COR_PROFILER"] = coragentguid;
+						additionalEnv["COR_PROFILER"] = profilerguid;
 					}
 					
                     pi = StartSuspendedProcess(procargs, additionalEnv);
